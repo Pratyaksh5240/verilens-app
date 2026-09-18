@@ -10,11 +10,13 @@ Security features:
 - Explicit Logging: Logs every rejection, network failure, and parser fallback with Python logging.
 """
 
+from __future__ import annotations
+
 import ipaddress
 import logging
 import re
 import socket
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 from urllib.parse import urljoin, urlparse
 
 import requests
@@ -35,9 +37,11 @@ CARRIER_GRADE_NAT = ipaddress.ip_network("100.64.0.0/10")
 CURRENT_NETWORK_V4 = ipaddress.ip_network("0.0.0.0/8")
 
 
-def is_ip_restricted(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+def is_ip_restricted(ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address]) -> bool:
     """Check whether an IP address belongs to any private, loopback, link-local, or reserved range."""
-    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast or ip.is_unspecified:
+    # is_unspecified was added in Python 3.13; use getattr with fallback for Python <= 3.12
+    is_unspecified = getattr(ip, "is_unspecified", False) or (str(ip) in ("0.0.0.0", "::"))
+    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast or is_unspecified:
         return True
 
     if isinstance(ip, ipaddress.IPv4Address):
@@ -69,6 +73,16 @@ def validate_url_for_ssrf(url: str) -> Tuple[bool, Optional[str]]:
     # Reject embedded userinfo (e.g., http://user:pass@host)
     if parsed.username or parsed.password:
         return False, "URLs with embedded credentials are not permitted."
+
+    # Immediately block local, loopback, and mDNS domain aliases
+    host_lower = hostname.lower().strip()
+    if (
+        host_lower in ("localhost", "127.0.0.1", "::1", "0.0.0.0")
+        or host_lower.endswith(".localhost")
+        or host_lower.endswith(".local")
+    ):
+        logger.warning("SSRF check blocked local/loopback hostname: %s", hostname)
+        return False, f"Access to local or loopback host '{hostname}' is blocked (SSRF safeguard)."
 
     port = parsed.port or (443 if scheme == "https" else 80)
 

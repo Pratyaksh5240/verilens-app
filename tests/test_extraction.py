@@ -29,7 +29,7 @@ def test_ssrf_rejects_private_and_loopback_ips(unsafe_url):
     is_safe, error_msg = validate_url_for_ssrf(unsafe_url)
     assert is_safe is False
     assert error_msg is not None
-    assert any(term in error_msg.lower() for term in ["blocked", "restricted", "private", "ssrf"])
+    assert any(term in error_msg.lower() for term in ["blocked", "restricted", "private", "ssrf", "local", "loopback"])
 
 
 @pytest.mark.parametrize(
