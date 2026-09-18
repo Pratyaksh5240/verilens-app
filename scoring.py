@@ -84,7 +84,6 @@ def analyze_writing_signals(text: str) -> Dict[str, object]:
     clean_text = (text or "").strip()
     lowered = clean_text.lower()
     words = re.findall(r"\b[\w'-]+\b", clean_text)
-    total_words = max(len(words), 1)
 
     sensational_hits = [p for p in SENSATIONAL_PATTERNS if p in lowered]
     conspiracy_hits = [p for p in CONSPIRACY_PATTERNS if p in lowered]
@@ -148,7 +147,9 @@ def analyze_writing_signals(text: str) -> Dict[str, object]:
     risk_flags: List[str] = []
 
     if attribution_matches:
-        supportive_signals.append(f"Contains {len(attribution_matches)} direct attribution phrase(s) ('said', 'reported', 'according to').")
+        supportive_signals.append(
+            f"Contains {len(attribution_matches)} direct attribution phrase(s) ('said', 'reported', 'according to')."
+        )
     if numeric_matches:
         supportive_signals.append(f"Includes {len(numeric_matches)} concrete numeric references or dates.")
     if evidence_hits:
@@ -217,12 +218,14 @@ def compute_credibility_score(
     if recognized_authority_score > 0.0:
         breakdown.append(("Recognized publisher authority", source_contribution))
 
-    breakdown.extend([
-        ("Article structure quality", quality_contribution),
-        ("Cross-source corroboration", corroboration_contribution),
-        ("Evidence & attribution cues", evidence_contribution),
-        ("Writing quality (low manipulation)", writing_contribution),
-    ])
+    breakdown.extend(
+        [
+            ("Article structure quality", quality_contribution),
+            ("Cross-source corroboration", corroboration_contribution),
+            ("Evidence & attribution cues", evidence_contribution),
+            ("Writing quality (low manipulation)", writing_contribution),
+        ]
+    )
 
     # Neutral presentation adjustment: distinguishes calm, unverified claims from manipulative forwards
     if recognized_authority_score == 0.0 and writing_risk <= 0.05:
@@ -237,7 +240,12 @@ def compute_credibility_score(
         breakdown.append(("Established newsroom bonus", bonus))
 
     # Structured claim/summary bonus for non-recognized texts that display formal journalism cues
-    if recognized_authority_score == 0.0 and article_quality_score >= 0.30 and evidence_score >= 0.12 and writing_risk <= 0.10:
+    if (
+        recognized_authority_score == 0.0
+        and article_quality_score >= 0.30
+        and evidence_score >= 0.12
+        and writing_risk <= 0.10
+    ):
         structured_bonus = 0.12 if not has_live_data else 0.06
         score += structured_bonus
         breakdown.append(("Structured reporting bonus", structured_bonus))
@@ -263,18 +271,33 @@ def build_verdict(
         return "High Misinformation Risk", "Related news reporting indicates this claim has been debunked or contested."
 
     if writing_risk >= 0.50:
-        return "High Manipulation Risk", "Language displays heavy sensationalism, emotional pressure, or conspiracy framing."
+        return (
+            "High Manipulation Risk",
+            "Language displays heavy sensationalism, emotional pressure, or conspiracy framing.",
+        )
 
     if recognized_authority_score >= 0.90 and article_quality_score >= 0.60 and score >= 0.85:
-        return "Recognized Publisher Article", "Published by an established newsroom or fact-checker with solid reporting structure."
+        return (
+            "Recognized Publisher Article",
+            "Published by an established newsroom or fact-checker with solid reporting structure.",
+        )
 
     if score >= 0.65:
-        return "Likely Credible Reporting", "Displays characteristic evidence cues and low manipulation risk. Verify source link if unattached."
+        return (
+            "Likely Credible Reporting",
+            "Displays characteristic evidence cues and low manipulation risk. Verify source link if unattached.",
+        )
 
     if score >= 0.45:
-        return "Unverified Claim / Needs Context", "Language is plausible, but independent corroboration or source verification is missing."
+        return (
+            "Unverified Claim / Needs Context",
+            "Language is plausible, but independent corroboration or source verification is missing.",
+        )
 
-    return "Low Credibility / Verify Before Forwarding", "Caution signals outweigh evidence cues. Avoid sharing without cross-checking."
+    return (
+        "Low Credibility / Verify Before Forwarding",
+        "Caution signals outweigh evidence cues. Avoid sharing without cross-checking.",
+    )
 
 
 def analyze_credibility(
@@ -307,6 +330,7 @@ def analyze_credibility(
 
     if live_results:
         from verification import assess_live_coverage
+
         assessment = assess_live_coverage(title or text[:200], live_results)
         corroboration_score = float(assessment["corroboration_score"])
         debunk_penalty = float(assessment["debunk_penalty"])

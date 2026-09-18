@@ -14,7 +14,7 @@ import ipaddress
 import logging
 import re
 import socket
-from typing import List, Optional, Set, Tuple
+from typing import List, Optional, Tuple
 from urllib.parse import urljoin, urlparse
 
 import requests
@@ -37,14 +37,7 @@ CURRENT_NETWORK_V4 = ipaddress.ip_network("0.0.0.0/8")
 
 def is_ip_restricted(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
     """Check whether an IP address belongs to any private, loopback, link-local, or reserved range."""
-    if (
-        ip.is_private
-        or ip.is_loopback
-        or ip.is_link_local
-        or ip.is_reserved
-        or ip.is_multicast
-        or ip.is_unspecified
-    ):
+    if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast or ip.is_unspecified:
         return True
 
     if isinstance(ip, ipaddress.IPv4Address):
@@ -113,9 +106,7 @@ def validate_url_for_ssrf(url: str) -> Tuple[bool, Optional[str]]:
         try:
             resolved_ip = ipaddress.ip_address(ip_str)
             if is_ip_restricted(resolved_ip):
-                logger.warning(
-                    "SSRF check blocked resolved IP %s for hostname %s", ip_str, hostname
-                )
+                logger.warning("SSRF check blocked resolved IP %s for hostname %s", ip_str, hostname)
                 return False, f"Access to restricted IP range '{ip_str}' is blocked (SSRF safeguard)."
         except ValueError:
             return False, f"Resolved address '{ip_str}' is malformed."
@@ -202,7 +193,10 @@ def fetch_url_content_safely(url: str) -> Tuple[Optional[str], Optional[str]]:
                             MAX_RESPONSE_BYTES,
                             current_url,
                         )
-                        return None, f"Page exceeded maximum allowed download size ({MAX_RESPONSE_BYTES // (1024 * 1024)}MB)."
+                        return (
+                            None,
+                            f"Page exceeded maximum allowed download size ({MAX_RESPONSE_BYTES // (1024 * 1024)}MB).",
+                        )
                     chunks.append(chunk)
         except requests.exceptions.RequestException as exc:
             logger.warning("Stream read failed for %s: %s", current_url, exc)

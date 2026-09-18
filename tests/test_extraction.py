@@ -3,10 +3,8 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from bs4 import BeautifulSoup
 
 from extraction import (
-    collect_paragraph_text,
     extract_article_content,
     fetch_url_content_safely,
     validate_url_for_ssrf,

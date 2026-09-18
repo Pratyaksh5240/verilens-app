@@ -12,7 +12,7 @@ import html
 import logging
 import re
 from difflib import SequenceMatcher
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Set, Tuple
 from urllib.parse import urlparse
 
 import requests
@@ -183,7 +183,11 @@ def assess_live_coverage(
         title = str(article.get("title") or "")
         desc = str(article.get("description") or "")
         url = str(article.get("url") or "")
-        source_name = str((article.get("source") or {}).get("name") if isinstance(article.get("source"), dict) else article.get("source", "Unknown"))
+        source_name = str(
+            (article.get("source") or {}).get("name")
+            if isinstance(article.get("source"), dict)
+            else article.get("source", "Unknown")
+        )
         domain = normalize_domain_name(url)
 
         combined_text = f"{title} {desc}".lower()
@@ -194,9 +198,7 @@ def assess_live_coverage(
         if is_debunk:
             debunk_hits += 1
 
-        is_recognized = domain in RECOGNIZED_OUTLETS or any(
-            alias in source_name.lower() for alias in OUTLET_ALIASES
-        )
+        is_recognized = domain in RECOGNIZED_OUTLETS or any(alias in source_name.lower() for alias in OUTLET_ALIASES)
         if is_recognized and domain not in seen_domains:
             recognized_domains_count += 1
 
@@ -211,17 +213,19 @@ def assess_live_coverage(
         else:
             match_label = "Related topic"
 
-        processed_results.append({
-            "title": title,
-            "description": desc,
-            "url": url,
-            "source": source_name,
-            "domain": domain,
-            "match_score": round(match_score, 3),
-            "match_label": match_label,
-            "debunk_hit": is_debunk,
-            "recognized": is_recognized,
-        })
+        processed_results.append(
+            {
+                "title": title,
+                "description": desc,
+                "url": url,
+                "source": source_name,
+                "domain": domain,
+                "match_score": round(match_score, 3),
+                "match_label": match_label,
+                "debunk_hit": is_debunk,
+                "recognized": is_recognized,
+            }
+        )
 
         total_match_score += match_score
 
@@ -242,12 +246,16 @@ def assess_live_coverage(
     caution_flags: List[str] = []
 
     if recognized_domains_count >= 2:
-        supportive_signals.append(f"Corroborating coverage found across {len(seen_domains)} distinct domains including recognized newsrooms.")
+        supportive_signals.append(
+            f"Corroborating coverage found across {len(seen_domains)} distinct domains including recognized newsrooms."
+        )
     elif len(seen_domains) >= 2:
         supportive_signals.append(f"Related news reporting detected across {len(seen_domains)} distinct publishers.")
 
     if debunk_hits > 0:
-        caution_flags.append(f"Debunking/fact-check terminology ('false', 'debunked', 'fact-check') appeared in {debunk_hits} matching news article(s).")
+        caution_flags.append(
+            f"Debunking/fact-check terminology ('false', 'debunked', 'fact-check') appeared in {debunk_hits} matching news article(s)."
+        )
 
     return {
         "corroboration_score": round(corroboration_score, 3),

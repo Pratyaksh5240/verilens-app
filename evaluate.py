@@ -7,8 +7,7 @@ and outputs accuracy, precision, recall, F1 scores, and a confusion matrix.
 import csv
 import os
 import sys
-from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from emotion import analyze_emotion
 from scoring import analyze_credibility
@@ -34,10 +33,10 @@ def run_evaluation(dataset_path: str = "data/evaluation_set.csv") -> Dict[str, o
         for row in reader:
             rows.append(row)
 
-    print(f"\n==================================================================")
-    print(f"  VeriLens Credibility Pipeline Evaluation Benchmark")
+    print("\n==================================================================")
+    print("  VeriLens Credibility Pipeline Evaluation Benchmark")
     print(f"  Dataset: {dataset_path} ({len(rows)} cases)")
-    print(f"==================================================================\n")
+    print("==================================================================\n")
 
     y_true: List[str] = []
     y_pred: List[str] = []
@@ -87,7 +86,9 @@ def run_evaluation(dataset_path: str = "data/evaluation_set.csv") -> Dict[str, o
             if is_match:
                 fear_cases_correct += 1
 
-        print(f"{row_id:<4} | {ground_truth:<12} | {predicted:<12} | {score*100:>5.1f}% | {emotion_type:<7} | {status_icon}")
+        print(
+            f"{row_id:<4} | {ground_truth:<12} | {predicted:<12} | {score*100:>5.1f}% | {emotion_type:<7} | {status_icon}"
+        )
 
     total = len(y_true)
     correct = sum(1 for yt, yp in zip(y_true, y_pred) if yt == yp)
@@ -105,20 +106,24 @@ def run_evaluation(dataset_path: str = "data/evaluation_set.csv") -> Dict[str, o
         f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
 
         per_class_metrics[c] = {
-            "tp": tp, "fp": fp, "fn": fn,
+            "tp": tp,
+            "fp": fp,
+            "fn": fn,
             "precision": round(precision, 3),
             "recall": round(recall, 3),
             "f1": round(f1, 3),
         }
 
     print("\n" + "=" * 65)
-    print(f"  PERFORMANCE SUMMARY")
+    print("  PERFORMANCE SUMMARY")
     print("=" * 65)
     print(f"Overall Accuracy:  {correct}/{total} ({overall_accuracy * 100:.1f}%)")
     if total_fear_cases > 0:
         fear_acc = fear_cases_correct / total_fear_cases
-        print(f"High-Fear Resilience: {fear_cases_correct}/{total_fear_cases} ({fear_acc * 100:.1f}%) "
-              f"(Ensures disaster journalism is not misclassified)")
+        print(
+            f"High-Fear Resilience: {fear_cases_correct}/{total_fear_cases} ({fear_acc * 100:.1f}%) "
+            f"(Ensures disaster journalism is not misclassified)"
+        )
 
     print("\nPer-Class Breakdown:")
     print(f"{'Class':<14} | {'Precision':<10} | {'Recall':<10} | {'F1-Score':<10} | {'Support':<8}")
@@ -132,7 +137,9 @@ def run_evaluation(dataset_path: str = "data/evaluation_set.csv") -> Dict[str, o
     print(f"{'':<14} | {'Pred: credible':<15} | {'Pred: unreliable':<17} | {'Pred: mixed':<12}")
     print("-" * 65)
     for c in classes:
-        print(f"True: {c:<8} | {confusion[c]['credible']:<15} | {confusion[c]['unreliable']:<17} | {confusion[c]['mixed']:<12}")
+        print(
+            f"True: {c:<8} | {confusion[c]['credible']:<15} | {confusion[c]['unreliable']:<17} | {confusion[c]['mixed']:<12}"
+        )
     print("=" * 65 + "\n")
 
     return {

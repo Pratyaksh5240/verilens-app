@@ -400,7 +400,11 @@ def render_analysis_dashboard(result: Dict[str, object], preview_text: str, titl
     # Emotional Intensity Diagnostic (Decoupled from Credibility Score)
     emotion_tone = str(emotion_diag.get("label", "neutral")).title()
     emotion_intensity = str(emotion_diag.get("intensity", "Low"))
-    c4.metric("Emotional Framing", f"{emotion_tone} ({emotion_intensity})", help="Diagnostic signal: emotional intensity is not penalized in the credibility score.")
+    c4.metric(
+        "Emotional Framing",
+        f"{emotion_tone} ({emotion_intensity})",
+        help="Diagnostic signal: emotional intensity is not penalized in the credibility score.",
+    )
 
     if title:
         st.markdown(f"**Title:** {sanitize_html(title)}")
@@ -409,7 +413,9 @@ def render_analysis_dashboard(result: Dict[str, object], preview_text: str, titl
         st.markdown(f"**Domain:** `{sanitize_html(result['domain'])}` ({domain_label})")
 
     # Explanation Tabs
-    tab_why, tab_coverage, tab_emotion, tab_preview = st.tabs(["Why This Score", "Live Coverage", "Emotional Tone Diagnostic", "Content Preview"])
+    tab_why, tab_coverage, tab_emotion, tab_preview = st.tabs(
+        ["Why This Score", "Live Coverage", "Emotional Tone Diagnostic", "Content Preview"]
+    )
 
     with tab_why:
         left, right = st.columns(2)
@@ -444,11 +450,19 @@ def render_analysis_dashboard(result: Dict[str, object], preview_text: str, titl
         else:
             for item in live_items:
                 m_label = sanitize_html(str(item.get("match_label")))
-                chip_cls = "chip-good" if "Strong" in m_label else ("chip-warn" if "Possible" in m_label else "chip-risk")
+                chip_cls = (
+                    "chip-good" if "Strong" in m_label else ("chip-warn" if "Possible" in m_label else "chip-risk")
+                )
                 raw_url = sanitize_html(str(item.get("url", "")))
-                title_html = f"<a href='{raw_url}' target='_blank'>{sanitize_html(str(item.get('title')))}</a>" if raw_url else sanitize_html(str(item.get("title")))
+                title_html = (
+                    f"<a href='{raw_url}' target='_blank'>{sanitize_html(str(item.get('title')))}</a>"
+                    if raw_url
+                    else sanitize_html(str(item.get("title")))
+                )
 
-                chips = [f"<span class='chip {chip_cls}'>{m_label} ({float(item.get('match_score', 0)) * 100:.0f}%)</span>"]
+                chips = [
+                    f"<span class='chip {chip_cls}'>{m_label} ({float(item.get('match_score', 0)) * 100:.0f}%)</span>"
+                ]
                 if item.get("recognized"):
                     chips.append("<span class='chip chip-good'>Recognized Outlet</span>")
                 if item.get("debunk_hit"):
@@ -524,7 +538,9 @@ with col_text:
     st.subheader("2. Text & Claim Verification")
     st.caption("Paste a claim, message excerpt, or social forward for linguistic and evidence screening.")
 
-    text_val = st.text_area("Pasted Text / Message", height=150, key="user_text", placeholder="Paste article text or forwarded claim...")
+    text_val = st.text_area(
+        "Pasted Text / Message", height=150, key="user_text", placeholder="Paste article text or forwarded claim..."
+    )
     opt_url = st.text_input("Optional Source URL", key="text_source_url", placeholder="https://...")
     opt_outlet = st.text_input("Optional Outlet Name", key="text_outlet", placeholder="Reuters, BBC, The Hindu...")
 

@@ -1,6 +1,5 @@
 """Unit tests for scoring.py pure functions, decoupled emotion, and publisher directory lookup."""
 
-import pytest
 from scoring import (
     analyze_credibility,
     analyze_writing_signals,

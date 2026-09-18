@@ -3,7 +3,6 @@
 import logging
 from unittest.mock import MagicMock, patch
 
-import pytest
 from emotion import (
     analyze_emotion,
     detect_emotion_fallback,
@@ -19,7 +18,9 @@ def test_analyze_emotion_empty_text():
 
 
 def test_fallback_detects_fear_keywords():
-    label, score = detect_emotion_fallback("A deadly crisis and terrifying danger threatens the region with severe panic.")
+    label, score = detect_emotion_fallback(
+        "A deadly crisis and terrifying danger threatens the region with severe panic."
+    )
     assert label == "fear"
     assert score >= 0.70
 
@@ -31,7 +32,9 @@ def test_fallback_detects_anger_keywords():
 
 
 def test_fallback_returns_neutral_for_objective_text():
-    label, score = detect_emotion_fallback("The committee reviewed the three proposals submitted by the engineering team.")
+    label, score = detect_emotion_fallback(
+        "The committee reviewed the three proposals submitted by the engineering team."
+    )
     assert label == "neutral"
     assert score == 0.50
 

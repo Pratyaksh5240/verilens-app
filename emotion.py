@@ -60,25 +60,61 @@ def detect_emotion_fallback(text: str) -> Tuple[str, float]:
 
     lexicon = {
         "fear": [
-            "panic", "danger", "fear", "terrified", "scared", "threat", "warning",
-            "crisis", "collapse", "alarming", "deadly", "fatal", "horror"
+            "panic",
+            "danger",
+            "fear",
+            "terrified",
+            "scared",
+            "threat",
+            "warning",
+            "crisis",
+            "collapse",
+            "alarming",
+            "deadly",
+            "fatal",
+            "horror",
         ],
         "anger": [
-            "outrage", "angry", "rage", "corrupt", "fraud", "shocking", "furious",
-            "scandal", "treason", "disgrace", "shameful", "betrayal"
+            "outrage",
+            "angry",
+            "rage",
+            "corrupt",
+            "fraud",
+            "shocking",
+            "furious",
+            "scandal",
+            "treason",
+            "disgrace",
+            "shameful",
+            "betrayal",
         ],
         "joy": [
-            "happy", "celebrate", "win", "success", "hope", "joy", "triumph",
-            "breakthrough", "achievement", "delight", "proud"
+            "happy",
+            "celebrate",
+            "win",
+            "success",
+            "hope",
+            "joy",
+            "triumph",
+            "breakthrough",
+            "achievement",
+            "delight",
+            "proud",
         ],
         "sadness": [
-            "sad", "tragic", "death", "grief", "loss", "cry", "mourn",
-            "heartbroken", "casualty", "devastation", "sorrow"
+            "sad",
+            "tragic",
+            "death",
+            "grief",
+            "loss",
+            "cry",
+            "mourn",
+            "heartbroken",
+            "casualty",
+            "devastation",
+            "sorrow",
         ],
-        "surprise": [
-            "unexpected", "astonishing", "shock", "unbelievable", "stunned",
-            "staggering", "unprecedented"
-        ],
+        "surprise": ["unexpected", "astonishing", "shock", "unbelievable", "stunned", "staggering", "unprecedented"],
     }
 
     scores = {label: sum(word in text_lower for word in words) for label, words in lexicon.items()}

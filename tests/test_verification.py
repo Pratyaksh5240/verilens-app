@@ -1,7 +1,7 @@
 """Unit tests for verification.py covering headline cleaning, keyphrase extraction, and NewsAPI client."""
 
 import logging
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 import requests
