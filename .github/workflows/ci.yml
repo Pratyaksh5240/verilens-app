@@ -39,7 +39,7 @@ jobs:
 
       - name: Run Pytest Suite
         run: |
-          pytest -v --tb=short tests/
+          python -m pytest -v --tb=short tests/
 
       - name: Run Credibility Evaluation Benchmark
         run: |
